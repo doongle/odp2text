@@ -90,10 +90,10 @@ def extract_song(slides):
             # No text <p> element. This is last slide which is usually empty
             continue
 
-        slideNo = slide.attributes['draw:name'].value[4:]
+        slideNo = int(slide.attributes['draw:name'].value[4:])
 
         for textP in textPs:
-            if slideNo == 'page1':
+            if slideNo == 1:
                 if textP.attributes['text:style-name'].value == 'P1':
                     # this is song title; do this only on 'page1'
                     songTitle = get_text(textP)
