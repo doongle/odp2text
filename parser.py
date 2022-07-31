@@ -21,7 +21,9 @@ def unzip(file):
         with zipfile.ZipFile(file, 'r') as zipObj:
             fileList = zipObj.namelist()
             if targetFile in fileList:
-                zipObj.extract(targetFile, tmpDirectory)
+                target = zipObj.getinfo(targetFile)
+                target.filename = file.replace(' ', '_') + '-' + target.filename
+                zipObj.extract(target, tmpDirectory)
             else:
                 print(targetFile + ' is not in zipfile')
     else:
