@@ -7,18 +7,21 @@
 # text:span "T3" = verse
 # text:span "T2" = lyrics
 
-import zipfile, json
+import zipfile, json, os
 from xml.dom import minidom
 
 tmpfile = '/home/calvin/Documents/sdic/backups/sdic-backup_2022-04-30_1735_full/sdi.church/Worship Presentation/ODP/Praises/Agnus Dei.odp'
+tmpDirectory = './tmp/'
 targetFile = 'content.xml'
 
 def unzip(file):
+    if not os.path.exists(tmpDirectory):
+        os.mkdir(tmpDirectory)
     if zipfile.is_zipfile(tmpfile):
         with zipfile.ZipFile(file, 'r') as zipObj:
             fileList = zipObj.namelist()
             if targetFile in fileList:
-                zipObj.extract(targetFile, '.')
+                zipObj.extract(targetFile, tmpDirectory)
             else:
                 print(targetFile + ' is not in zipfile')
     else:
@@ -114,7 +117,7 @@ def extract_song(slides):
 
 if __name__ == '__main__':
     #unzip(tmpfile)
-    odpObj = load_ODP(targetFile)
+    odpObj = load_ODP(tmpDirectory + targetFile)
     slides = get_slides(odpObj)
     song = extract_song(slides)
 
