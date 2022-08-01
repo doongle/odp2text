@@ -11,7 +11,7 @@ import zipfile, json, os
 from xml.dom import minidom
 
 tmpfile = '/home/calvin/Documents/sdic/backups/sdic-backup_2022-04-30_1735_full/sdi.church/Worship Presentation/ODP/Praises/Agnus Dei.odp'
-tmpDirectory = './tmp/'
+tmpDirectory = '../song_data/xml/'
 targetFile = 'content.xml'
 
 def unzip(file):
@@ -23,7 +23,8 @@ def unzip(file):
             if targetFile in fileList:
                 target = zipObj.getinfo(targetFile)
                 target.filename = file.replace(' ', '_') + '-' + target.filename
-                zipObj.extract(target, tmpDirectory)
+                if not os.path.exists(target.filename):
+                    zipObj.extract(target, tmpDirectory)
             else:
                 print(targetFile + ' is not in zipfile')
     else:
