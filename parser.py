@@ -10,7 +10,7 @@
 import zipfile, json, os
 from xml.dom import minidom
 
-tmpfile = '/home/calvin/Documents/sdic/backups/sdic-backup_2022-04-30_1735_full/sdi.church/Worship Presentation/ODP/Praises/Agnus Dei.odp'
+tmpfile = '../song_data/ODP/Praises/10,000 Reasons.odp'
 tmpDirectory = '../song_data/xml/'
 targetFile = 'content.xml'
 
@@ -44,18 +44,21 @@ def get_textPs(slide):
 
 def get_text(textP):
     text = []
-    #nodeList => text:span
+    #nodeList => list of text:span objects
     nodeList = textP.childNodes
     line = ''
+    # loop through text:span objects
     for node in nodeList:
         element = node.firstChild
-        if element.nodeType == element.TEXT_NODE:
+        if element != None and element.nodeType == element.TEXT_NODE:
             # if a song line is spread to multiple lines with span, gather them into one line
             line += element.data
         else:
-            text.append(line)
-            line = ''
-    text.append(line)
+            if element:     # if not empty(None), append
+                text.append(line)
+            line=''
+    if line:        # if not empty, append
+        text.append(line)
     return text
 
 def get_verseNo(verse):
@@ -93,9 +96,9 @@ def extract_song(slides):
         lyric = []
         textPs = get_textPs(slide)
 
-        if textPs.length == 0:
-            # No text <p> element. This is last slide which is usually empty
-            continue
+        # if textPs.length == 0:
+        #     # No text <p> element. This is last slide which is usually empty
+        #     continue
 
         slideNo = int(slide.attributes['draw:name'].value[4:])
 
@@ -105,13 +108,15 @@ def extract_song(slides):
                     # this is song title; do this only on 'page1'
                     songTitle = get_text(textP)
                     data['title'] = ''.join(songTitle)
-            if textP.attributes['text:style-name'].value == 'P3':
+            if textP.attributes['text:style-name'].value in ['P3', 'P10']:
                 # this is lyric
                 lyric += get_text(textP)
             elif textP.attributes['text:style-name'].value == 'P5':
-                # this is verse
-                verse = get_text(textP)
-        
+                # this is verse#
+                result = get_text(textP)
+                if result:
+                    verse = result
+
         verseNo = get_verseNo(verse)
         data['slides'][slideNo] = {
             verseNo: lyric
@@ -120,9 +125,10 @@ def extract_song(slides):
     
 
 if __name__ == '__main__':
-    unzip(tmpfile)
-    odpObj = load_ODP(tmpDirectory + targetFile)
+    xmlFile = unzip(tmpfile)
+    odpObj = load_ODP(tmpDirectory + xmlFile)
     slides = get_slides(odpObj)
+    slides.pop()    # remove last slide which is usually empty
     song = extract_song(slides)
 
     print(json.dumps(song, indent=4))
