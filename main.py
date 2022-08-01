@@ -1,19 +1,18 @@
-import parser, glob, zipfile
+import parser, glob, zipfile, json
 
-song_directory = './Praises/'
+song_directory = '../song_data/ODP/Praises/'
+tmpDirectory = '../song_data/xml/'
+targetFile = 'content.xml'
 
 ODPs = glob.glob(song_directory + "*.odp")
 
-def unzip2(file):
-    targetFile = 'content.xmls'
-    with zipfile.ZipFile(file, 'r') as zipObj:
-        target = zipObj.getinfo(targetFile)
-        print(target)
-        # print(file + '-' + target.filename)
-        # target.filename = file.replace(' ', '_') + '-' + target.filename
-        # zipObj.extract(target)
-
-
 if __name__ == '__main__':
-    # print(ODPs)
-    unzip2('Agnus Dei.odp')
+    for odp in ODPs:
+        xmlFile = parser.unzip(odp)
+        odpObj = parser.load_ODP(tmpDirectory + xmlFile)
+        slides = parser.get_slides(odpObj)
+        song = parser.extract_song(slides)
+        print(json.dumps(song, indent=4))
+        stop = input('Press <ENTER> to continue or any other key to stop: ')
+        if stop:
+            break
