@@ -25,6 +25,7 @@ def unzip(file):
                 target.filename = file.replace(' ', '_').split('/')[-1] + '-' + target.filename
                 if not os.path.exists(tmpDirectory + target.filename):
                     zipObj.extract(target, tmpDirectory)
+                return target.filename
             else:
                 print(targetFile + ' is not in zipfile')
     else:
@@ -120,11 +121,11 @@ def extract_song(slides):
 
 if __name__ == '__main__':
     unzip(tmpfile)
-    # odpObj = load_ODP(tmpDirectory + targetFile)
-    # slides = get_slides(odpObj)
-    # song = extract_song(slides)
+    odpObj = load_ODP(tmpDirectory + targetFile)
+    slides = get_slides(odpObj)
+    song = extract_song(slides)
 
-    # print(json.dumps(song, indent=4))
+    print(json.dumps(song, indent=4))
 
 
         
