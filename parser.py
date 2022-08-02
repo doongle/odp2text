@@ -10,7 +10,7 @@
 import zipfile, json, os
 from xml.dom import minidom
 
-tmpfile = '../song_data/ODP/Praises/10,000 Reasons.odp'
+tmpfile = '../song_data/ODP/Praises/Blessed Be Your Name.odp'
 tmpDirectory = '../song_data/xml/'
 targetFile = 'content.xml'
 
@@ -108,7 +108,7 @@ def extract_song(slides):
                     # this is song title; do this only on 'page1'
                     songTitle = get_text(textP)
                     data['title'] = ''.join(songTitle)
-            if textP.attributes['text:style-name'].value in ['P3', 'P10']:
+            if textP.attributes['text:style-name'].value in ['P3', 'P8', 'P10']:
                 # this is lyric
                 lyric += get_text(textP)
             elif textP.attributes['text:style-name'].value == 'P5':
