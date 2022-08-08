@@ -10,7 +10,7 @@
 import zipfile, json, os
 from xml.dom import minidom
 
-tmpfile = '../song_data/ODP/Praises/Blessed Be Your Name.odp'
+tmpfile = '../song_data/ODP/Praises/Fall - Hide Me Now.odp'
 tmpDirectory = '../song_data/xml/'
 targetFile = 'content.xml'
 
@@ -56,10 +56,50 @@ def get_text(textP):
         else:
             if element:     # if not empty(None), append
                 text.append(line)
+                line=''
+    if line:        # if not empty, append
+        text.append(line)
+    return text
+
+def get_text_2022_08_07(textP):
+    text = []
+    #nodeList => list of text:span objects
+    nodeList = textP.childNodes
+    line = ''
+    # loop through text:span objects
+    for node in nodeList:
+        element = node.firstChild
+        if element != None and element.nodeType == element.TEXT_NODE:
+            # if a song line is spread to multiple lines with span, gather them into one line
+            line += element.data
+        else:
+            if element:     # if not empty(None), append
+                text.append(line)
             line=''
     if line:        # if not empty, append
         text.append(line)
     return text
+
+
+def get_text_debug(textP):
+    slide = []
+    line = ''
+    #nodeList => list of text:span objects
+    nodeList = textP.childNodes
+    # loop through text:span objects
+    for node in nodeList:
+        element = node.firstChild
+        if element != None and element.nodeType == element.TEXT_NODE:
+            # if a song line is spread to multiple lines with span, gather them into one line
+            line += element.data
+        else:
+            if element:     # if not empty(None), append
+                slide.append(line)
+                line=''
+    if line:        # if not empty, append
+        slide.append(line)
+    return slide
+
 
 def get_verseNo(verse):
     str = ''.join(verse).lower()
@@ -108,14 +148,15 @@ def extract_song(slides):
                     # this is song title; do this only on 'page1'
                     songTitle = get_text(textP)
                     data['title'] = ''.join(songTitle)
-            if textP.attributes['text:style-name'].value in ['P3', 'P8', 'P10']:
-                # this is lyric
-                lyric += get_text(textP)
-            elif textP.attributes['text:style-name'].value == 'P5':
-                # this is verse#
-                result = get_text(textP)
-                if result:
-                    verse = result
+            if textP.hasAttributes():
+                if textP.attributes['text:style-name'].value in ['P3', 'P8', 'P10']:
+                    # this is lyric
+                    lyric += get_text(textP)
+                elif textP.attributes['text:style-name'].value == 'P5':
+                    # this is verse#
+                    result = get_text(textP)
+                    if result:
+                        verse = result
 
         verseNo = get_verseNo(verse)
         data['slides'][slideNo] = {
